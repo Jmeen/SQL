@@ -54,8 +54,10 @@ ORDER BY reg.region_name , coun.country_name DESC;
 --사번(employee_id), 이름(first_name)과 채용일(hire_date), 매니저이름(first_name), 매니저입
 --사일(hire_date)을 조회하세요.(37건)
 SELECT emp.employee_id 사번, emp.first_name 이름, emp.hire_date 채용일 , man.first_name 매니저이름, man.hire_date 매니저입사일
-FROM employees emp JOIN employees man 
-ON emp.hire_date < man.hire_date;
+FROM employees emp 
+JOIN employees man ON emp.manager_id=man.employee_id
+WHERE emp.hire_date<man.hire_date
+ORDER by emp.employee_id;
 
 --문제6.
 --나라별로 어떠한 부서들이 위치하고 있는지 파악하려고 합니다.
