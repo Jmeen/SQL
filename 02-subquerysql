@@ -104,3 +104,26 @@ SELECT first_name, salary, hire_date FROM employees WHERE salary > 12000;  -- 6
 SELECT first_name, salary, hire_date FROM employees WHERE hire_date < ' 05/01/01' 
 minus 
 SELECT first_name, salary, hire_date FROM employees WHERE salary > 12000;  --18
+
+
+--- 순위함수
+-- RANK() : 중복 순위가 있으면 건너뛴다.
+-- DENSE RANK () : 중복순위 상관없이 다음 순위
+-- ROW_MUMBER() : 순위상관없이 차례대로
+
+SELECT salary, first_name, 
+    RANK() OVER (ORDER BY salary DESC) rank,
+    DENSE_RANK() OVER (ORDER BY salary DESC) dense_rank,
+    ROW_NUMBER() OVER (ORDER BY salary DESC) row_number
+FROM employees;
+
+-- hierachical query : 계층적 쿼리
+-- yree 형태의 구조 추출
+-- LEVEL이라는 가상 컬럼이 생긴다.
+
+SELECT LEVEL,employee_id, first_name, manager_id
+
+FROM employees
+START With manager_id is null  -- 트리 시작 조건
+CONNECT BY PRIOR employee_id=manager_id
+ORDER BY level;
