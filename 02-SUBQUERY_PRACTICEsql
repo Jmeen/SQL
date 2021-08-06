@@ -15,16 +15,32 @@ WHERE salary > =( SELECT ROUND(AVG(salary))FROM employees)
         and  salary <(SELECT MAX(salary) FROM employees)
 ORDER BY salary;
 
+SELECT e.employee_id, e.first_name, e.salary
+FROM employees e, (SELECT ROUND(AVG(salary))avgsalary, MAX(salary) Maxsalary FROM employees) t
+WHERE e.salary BETWEEN t.avgsalary and t.Maxsalary
+ORDER BY e.salary;
+
 
 --문제3.
 --직원중 Steven(first_name) king(last_name)이 소속된 부서(departments)가 있는 곳의 주소를 알아보려고 한다.
 --도시아이디(location_id), 거리명(street_address), 우편번호(postal_code), 도시명(city), 주(state_province), 나라아이디(country_id)를 출력하세요(1건)
-SELECT loc.location_id, loc.street_address, loc.postal_code, loc.city, loc.state_province ,loc.country_id
-FROM employees e
-JOIN departments d ON e.department_id = d.department_id
-JOIN locations loc ON d.location_id=loc.location_id
-WHERE e.manager_id IS NULL;
+--SELECT loc.location_id, loc.street_address, loc.postal_code, loc.city, loc.state_province ,loc.country_id
+--FROM employees e
+--JOIN departments d ON e.department_id = d.department_id
+--JOIN locations loc ON d.location_id=loc.location_id
+--WHERE e.manager_id IS NULL;
 
+--Query 1
+SELECT department_id FROM employees
+WHERE first_name = 'Steven' and last_name = 'King';
+--Query 2
+select location_id FROM departments
+WHERE department_id =(select department_id FROM employees WHERE first_name='Steven' and last_name ='King');
+--Query 3
+SELECT loc.location_id, loc.street_address, loc.postal_code, loc.city, loc.state_province ,loc.country_id
+FROM locations loc
+WHERE loc.location_id = (select location_id FROM departments
+                            WHERE department_id =(select department_id FROM employees WHERE first_name='Steven' and last_name ='King'));
 
 --문제4.
 --job_id 가 'ST_MAN' 인 직원의 급여보다 작은 직원의 사번,이름,급여를 급여의 내림차순으로
@@ -72,13 +88,29 @@ WHERE e.job_id = j.job_id
 GROUP BY j.job_title
 ORDER BY SUM(e.salary) desc;
 
+
+--- 강사 문제 풀이
+SELECT j.job_title, SUM(salary) sumSalary
+FROM employees Group BY job_id;
+
+SELECT j.job_title, t.sumSalary
+FROM jobs j , (SELECT job_id, SUM(salary) sumSalary
+                FROM employees Group BY job_id) t
+WHERE j.job_id=t.job_id;
+
 --문제7.
 --자신의 부서 평균 급여보다 연봉(salary)이 많은 직원의 직원번호(employee_id), 이름
 --(first_name)과 급여(salary)을 조회하세요(38건)
---SELECT AVG(salary) "Average" from employees GROUP BY department_id;
+SELECT AVG(salary) "Average" from employees GROUP BY department_id;
 
 SELECT employee_id,first_name, salary FROM employees e
 WHERE e.salary>(SELECT AVG(salary) salary  FROM employees dpt WHERE e.department_id = dpt.department_id);
+
+-- 다른방법
+SELECT e.employee_id, e.first_name, e.salary 
+FROM employees e, (SELECT department_id, AVG(salary) salary  FROM employees GROUP BY department_id) t
+WHERE e.department_id = t.department_id
+and e.salary>t.salary;
 
 
 --문제8.
