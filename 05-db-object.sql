@@ -196,3 +196,60 @@ DROP INDEX s_emp_id;
 SELECT * FROM USER_INDEXES;
 
 -- 인덱스는 테이블과 독립적: 인덱스 삭제해도 테이블 데이터는 남아있다.
+
+
+-- SEQUENCE
+-- author 테이블 정보 확인
+SELECT MAX(author_id) FROM author;
+
+INSERT INTO author(author_id, author_name)
+VALUES((SELECT MAX(author_id)+1 FROM author),'Unknown');
+SELECT * FROM author;
+-- 안전하지 않을 수 있다.
+-- 시퀀스 생성, 안전하게 중복처리
+ROLLBACK;
+
+SELECT MAX(author_id) FROM author;
+CREATE SEQUENCE seq_author_id
+    start WITH 3
+    INCREMENT BY 1
+    MAXVALUE 10000000;
+    
+INSERT INTO author(author_id, author_name)
+values(seq_author_id.nextval,'Steven King');
+SELECT * FROM author;
+
+-- 새 시퀸스 만들기
+CREATE sequence my_seq
+    Start with 1
+    Increment by 2
+    maxvalue 10;
+    
+-- 수도컬럼 : CURRVAL(현재 시퀀스 값), NEXTVAL*(값을 증가 새값)
+select my_seq.nextval FROM dual;
+SELECT my_seq.currval FROM dual;
+
+-- 시퀀스 변경
+ALTER SEQUENCE my_seq
+    INCREMENT BY 3
+    MAXVALUE 1000000;
+    
+SELECT my_seq.currval FROM dual;
+select my_seq.nextval FROM dual;
+
+-- sequence를 위한 dictionary
+SELECT * FROM USER_SEQUENCEs;
+SELECT * FROM USER_OBJECTS
+WHERE object_type='SEQUENCE';
+
+-- 시퀀스 삭제
+DROP SEQUENCE my_seq;
+SELECT * FROM USER_SEQUENCES;
+
+-- book.book_id 를 위한 시퀀스 생성
+SELECT MAX(book_id) FROM book;
+CREATE SEQUENCE seq_book_id
+    START WITH 3
+    INCREMENT BY 1;
+
+SELECT * FROM USER_sequences;
